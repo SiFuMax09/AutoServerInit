@@ -55,7 +55,7 @@ This script is designed to initialize a server by connecting via SSH and adding 
 <ol>
   <li><strong>Download the Script</strong>:
     <ul>
-      <li>Save the script as <code>add_pubkeys.py</code> on your local system.</li>
+      <li>Save the script as <code>main.py</code> on your local system.</li>
     </ul>
   </li>
   <li><strong>Install Paramiko</strong>:
@@ -81,7 +81,7 @@ This script is designed to initialize a server by connecting via SSH and adding 
 
 <p>Run the script from the command line, providing the necessary arguments. Here’s the basic syntax:</p>
 
-<pre><code>python add_pubkeys.py -ip SERVER_IP -p PASSWORD [OPTIONS]</code></pre>
+<pre><code>python main.py -ip SERVER_IP -p PASSWORD [OPTIONS]</code></pre>
 
 <h3 id="command-line-arguments">Command-Line Arguments</h3>
 
@@ -153,28 +153,28 @@ This script is designed to initialize a server by connecting via SSH and adding 
 <p>Here are some examples to show how the script can be used:</p>
 
 <h3>Connect using password and add keys</h3>
-<pre><code>python add_pubkeys.py -ip 192.168.1.100 -p YourPassword</code></pre>
+<pre><code>python main.py -ip 192.168.1.100 -p YourPassword</code></pre>
 
 <h3>Using a custom SSH port</h3>
-<pre><code>python add_pubkeys.py -ip 192.168.1.100 -p YourPassword --port 2222</code></pre>
+<pre><code>python main.py -ip 192.168.1.100 -p YourPassword --port 2222</code></pre>
 
 <h3>Interactive password prompt</h3>
-<pre><code>python add_pubkeys.py -ip 192.168.1.100 --ask-pass</code></pre>
+<pre><code>python main.py -ip 192.168.1.100 --ask-pass</code></pre>
 
 <h3>Authenticate with SSH key file</h3>
-<pre><code>python add_pubkeys.py -ip 192.168.1.100 -u username -i ~/.ssh/id_rsa</code></pre>
+<pre><code>python main.py -ip 192.168.1.100 -u username -i ~/.ssh/id_rsa</code></pre>
 
 <h3>Execute an additional command on the server</h3>
-<pre><code>python add_pubkeys.py -ip 192.168.1.100 -p YourPassword -c "apt-get update && apt-get install -y nginx"</code></pre>
+<pre><code>python main.py -ip 192.168.1.100 -p YourPassword -c "apt-get update && apt-get install -y nginx"</code></pre>
 
 <h3>Enable verbose mode</h3>
-<pre><code>python add_pubkeys.py -ip 192.168.1.100 -p YourPassword --verbose</code></pre>
+<pre><code>python main.py -ip 192.168.1.100 -p YourPassword --verbose</code></pre>
 
 <h3>Set a connection timeout</h3>
-<pre><code>python add_pubkeys.py -ip 192.168.1.100 -p YourPassword --timeout 10</code></pre>
+<pre><code>python main.py -ip 192.168.1.100 -p YourPassword --timeout 10</code></pre>
 
 <h3>Simulate the script (dry run)</h3>
-<pre><code>python add_pubkeys.py -ip 192.168.1.100 -p YourPassword --dry-run</code></pre>
+<pre><code>python main.py -ip 192.168.1.100 -p YourPassword --dry-run</code></pre>
 
 <h3>Log the output to a file</h3>
-<pre><code>python add_pubkeys.py -ip 192.168.1.
+<pre><code>python main.py -ip 192.168.1.
