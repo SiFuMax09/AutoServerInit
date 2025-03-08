@@ -6,6 +6,40 @@ import site
 import subprocess
 from pathlib import Path
 
+def add_to_path(directory):
+    """Add a directory to the user's PATH environment variable."""
+    try:
+        # Get the current PATH
+        key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, "Environment", 0, winreg.KEY_ALL_ACCESS)
+        try:
+            path, _ = winreg.QueryValueEx(key, "PATH")
+        except WindowsError:
+            path = ""
+
+        # Add our directory if it's not already there
+        if directory.lower() not in [x.lower() for x in path.split(os.pathsep)]:
+            new_path = f"{path}{os.pathsep}{directory}" if path else directory
+            winreg.SetValueEx(key, "PATH", 0, winreg.REG_EXPAND_SZ, new_path)
+            os.environ["PATH"] = new_path
+            return True
+    except WindowsError as e:
+        print(f"Warning: Could not add to PATH: {e}")
+    finally:
+        try:
+            winreg.CloseKey(key)
+        except:
+            pass
+    return False
+
+def get_scripts_directory():
+    """Get the correct Scripts directory for installation."""
+    if hasattr(sys, 'real_prefix') or (hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix):
+        # We're in a virtual environment
+        return os.path.join(sys.prefix, 'Scripts')
+    else:
+        # We're in a user installation
+        return os.path.join(site.getuserbase(), 'Scripts')
+
 def enable_long_paths():
     """Enable long path support in Windows."""
     try:
@@ -37,8 +71,8 @@ def create_appdata_directory():
 def install_cli_command():
     """Install the CLI command to make it available system-wide."""
     try:
-        # Get the Python Scripts directory
-        scripts_dir = site.getusersitepackages().replace('site-packages', 'Scripts')
+        # Get the correct Scripts directory
+        scripts_dir = get_scripts_directory()
         os.makedirs(scripts_dir, exist_ok=True)
 
         # Create the CLI script
@@ -57,7 +91,14 @@ if __name__ == "__main__":
         with open(batch_file, 'w') as f:
             f.write(f'@echo off\n"{sys.executable}" "{cli_script}" %*')
 
-        print(f"CLI command installed successfully. You can now use 'serverinit' from the command line.")
+        # Add Scripts directory to PATH if needed
+        if add_to_path(scripts_dir):
+            print(f"Added {scripts_dir} to PATH")
+        else:
+            print(f"Note: You may need to add {scripts_dir} to your PATH manually")
+
+        print(f"CLI command installed successfully in: {scripts_dir}")
+        print("You may need to restart your terminal to use the 'serverinit' command")
         return True
 
     except Exception as e:
@@ -160,14 +201,18 @@ def main():
     
     # Install CLI command
     if install_cli_command():
-        print("CLI command installed successfully.")
+        print("\nImportant: You may need to restart your terminal to use the 'serverinit' command")
+        print(f"The command is installed in: {get_scripts_directory()}")
     else:
         print("Failed to install CLI command.")
         return
     
     print("\nInstallation completed successfully!")
-    print("You can now use 'serverinit' from the command line.")
     print(f"Your public keys are stored in: {os.path.join(appdata_path, 'pubkeys')}")
+    print("\nTo use the tool:")
+    print("1. Open a new terminal window")
+    print("2. Type 'serverinit' to start the GUI")
+    print("3. Or use 'serverinit -h' to see CLI options")
 
 if __name__ == '__main__':
     main() 
