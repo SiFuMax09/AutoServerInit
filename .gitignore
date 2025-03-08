@@ -3,3 +3,5 @@
 .cursor
 venv
 __pycache__
+AutoServerInit
+autoserverinit.egg-info
