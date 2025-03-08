@@ -6,6 +6,17 @@ import site
 import subprocess
 from pathlib import Path
 
+def enable_long_paths():
+    """Enable long path support in Windows."""
+    try:
+        key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"SYSTEM\CurrentControlSet\Control\FileSystem",
+                            0, winreg.KEY_SET_VALUE | winreg.KEY_WOW64_64KEY)
+        winreg.SetValueEx(key, "LongPathsEnabled", 0, winreg.REG_DWORD, 1)
+        winreg.CloseKey(key)
+        return True
+    except WindowsError:
+        return False
+
 def get_appdata_path():
     """Get the AppData path for storing configuration files."""
     return os.path.join(os.getenv('APPDATA'), 'AutoServerInit')
@@ -56,10 +67,23 @@ if __name__ == "__main__":
 def install_package():
     """Install the package using pip."""
     try:
+        # First, upgrade pip to latest version
+        subprocess.check_call([sys.executable, '-m', 'pip', 'install', '--upgrade', 'pip'])
+        
+        # Install PyQt6 separately first
+        subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'PyQt6>=6.6.1'])
+        
+        # Then install our package
         subprocess.check_call([sys.executable, '-m', 'pip', 'install', '-e', '.'])
         return True
     except subprocess.CalledProcessError as e:
         print(f"Error installing package: {e}")
+        print("\nTroubleshooting steps:")
+        print("1. Try running the installer with administrator privileges")
+        print("2. Make sure you have the latest pip version")
+        print("3. If the error persists, try installing PyQt6 manually:")
+        print("   pip install PyQt6>=6.6.1")
+        print("4. Then run the installer again")
         return False
 
 def create_setup_py():
@@ -102,6 +126,15 @@ def create_package_structure():
 def main():
     print("Installing AutoServerInit...")
     
+    # Try to enable long paths support
+    if enable_long_paths():
+        print("Long path support enabled successfully.")
+    else:
+        print("Warning: Could not enable long path support. You may need to:")
+        print("1. Run this installer as administrator")
+        print("2. Enable long path support manually in Windows settings")
+        print("3. Or use a shorter installation path")
+    
     # Create AppData directory and move pubkeys
     appdata_path = create_appdata_directory()
     print(f"Configuration directory created at: {appdata_path}")
@@ -115,10 +148,14 @@ def main():
     print("Setup file created.")
     
     # Install package
+    print("\nInstalling dependencies and package...")
     if install_package():
         print("Package installed successfully.")
     else:
-        print("Failed to install package.")
+        print("\nAlternative installation method:")
+        print("1. Open a new command prompt as administrator")
+        print("2. Run: pip install PyQt6>=6.6.1")
+        print("3. Then run this installer again")
         return
     
     # Install CLI command
